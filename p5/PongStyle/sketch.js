@@ -21,7 +21,7 @@ var pad2P = 0;
 var ballGoingUp = true;
 var ballGoingLeft = true;
 var ballVel = 2;
-var pad1Vel = 1;
+var pad1Vel = 2;
 var pad2Vel = pad1Vel;
 var end = false;
 
@@ -50,20 +50,50 @@ function drawPad2() {
 
 function draw() {
   // put drawing code here
-  background(0);
+  if (end)
+    exit()
   updateScore();
+  background(0);
   updateBall();
   kick();
-  dar();
+  movePads();
   drawBall();
   drawPad1();
   drawPad2();
-  if (end)
-    exit()
+
 }
 
 
-function dar() {
+async function movePad1() {
+  if (keyIsPressed) {
+    if (key == "w" || key == "W") {
+      if (left1 - pad1Vel < border1) {
+        left1 = border1;
+        right1 = border1 + padW;
+        return;
+      }
+      left1 -= pad1Vel;
+      right1 -= pad1Vel;
+    }
+    if (key == "s" || key == "S") {
+      if (left1 + padW + pad1Vel > border2) {
+        left1 = border2 - padW;
+        right1 = border2;
+        return;
+      }
+      left1 += pad1Vel;
+      right1 += pad1Vel;
+    }
+    return;
+  }
+}
+
+function movePads() {
+  movePad1();
+  movePad2();
+}
+
+async function movePad2() {
   if (keyIsPressed) {
     if (keyCode == UP_ARROW) {
       if (left2 - pad2Vel < border1) {
@@ -74,7 +104,7 @@ function dar() {
       left2 -= pad2Vel;
       right2 -= pad2Vel;
     }
-    else if (keyCode == DOWN_ARROW) {
+    if (keyCode == DOWN_ARROW) {
       if (left2 + padW + pad2Vel > border2) {
         left2 = border2 - padW;
         right2 = border2;
@@ -83,24 +113,7 @@ function dar() {
       left2 += pad2Vel;
       right2 += pad2Vel;
     }
-    if (key == "w" || key == "W") {
-      if (left1 - pad1Vel < border1) {
-        left1 = border1;
-        right1 = border1 + padW;
-        return;
-      }
-      left1 -= pad1Vel;
-      right1 -= pad1Vel;
-    }
-    else if (key == "s" || key == "S") {
-      if (left1 + padW + pad1Vel > border2) {
-        left1 = border2 - padW;
-        right1 = border2;
-        return;
-      }
-      left1 += pad1Vel;
-      right1 += pad1Vel;
-    }
+    return;
   }
 }
 
@@ -118,7 +131,7 @@ function endGame() {
     String(pad1P) + '-' + String(pad2P) + '\n' + ((pad2P == pad1P) ?
       "Empate" : ("Felicitaciones jugador " + ((pad1P < pad2P) ? "2" : "1")) + "!!!"));
   clear();
-  end=true;
+  end = true;
 }
 
 function updateTime() {
