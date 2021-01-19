@@ -21,8 +21,9 @@ var pad2P = 0;
 var ballGoingUp = true;
 var ballGoingLeft = true;
 var ballVel = 2;
-var pad1Vel = 10;
+var pad1Vel = 1;
 var pad2Vel = pad1Vel;
+var end = false;
 
 setInterval("updateTime()", 1000);
 
@@ -47,65 +48,60 @@ function drawPad2() {
   rect(pad2X, left2, padH, padW, padR);
 }
 
-function prueba() {
-  fill("white")
-  noStroke();
-  ellipse(pad1X + 2 * padH - 2, left1, ballW, ballH);
-  ellipse(pad1X + 2 * padH - 2, right1, ballW, ballH);
-  ellipse(pad2X - padH, left2, ballW, ballH);
-  ellipse(pad2X - padH, right2, ballW, ballH);
-}
-
 function draw() {
   // put drawing code here
   background(0);
   updateScore();
-  prueba();
   updateBall();
+  kick();
+  dar();
   drawBall();
   drawPad1();
   drawPad2();
+  if (end)
+    exit()
 }
 
 
-function keyPressed() {
-  if (keyCode == UP_ARROW) {
-    if (left2 - pad2Vel < border1) {
-      left2 = border1;
-      right2 = border1 + padW;
-      return;
+function dar() {
+  if (keyIsPressed) {
+    if (keyCode == UP_ARROW) {
+      if (left2 - pad2Vel < border1) {
+        left2 = border1;
+        right2 = border1 + padW;
+        return;
+      }
+      left2 -= pad2Vel;
+      right2 -= pad2Vel;
     }
-    left2 -= pad2Vel;
-    right2 -= pad2Vel;
-  }
-  else if (keyCode == DOWN_ARROW) {
-    if (left2 + padW + pad2Vel > border2) {
-      left2 = border2 - padW;
-      right2 = border2;
-      return;
+    else if (keyCode == DOWN_ARROW) {
+      if (left2 + padW + pad2Vel > border2) {
+        left2 = border2 - padW;
+        right2 = border2;
+        return;
+      }
+      left2 += pad2Vel;
+      right2 += pad2Vel;
     }
-    left2 += pad2Vel;
-    right2 += pad2Vel;
-  }
-  if (key == "w" || key == "W") {
-    if (left1 - pad1Vel < border1) {
-      left1 = border1;
-      right1 = border1 + padW;
-      return;
+    if (key == "w" || key == "W") {
+      if (left1 - pad1Vel < border1) {
+        left1 = border1;
+        right1 = border1 + padW;
+        return;
+      }
+      left1 -= pad1Vel;
+      right1 -= pad1Vel;
     }
-    left1 -= pad1Vel;
-    right1 -= pad1Vel;
-  }
-  else if (key == "s" || key == "S") {
-    if (left1 + padW + pad1Vel > border2) {
-      left1 = border2 - padW;
-      right1 = border2;
-      return;
+    else if (key == "s" || key == "S") {
+      if (left1 + padW + pad1Vel > border2) {
+        left1 = border2 - padW;
+        right1 = border2;
+        return;
+      }
+      left1 += pad1Vel;
+      right1 += pad1Vel;
     }
-    left1 += pad1Vel;
-    right1 += pad1Vel;
   }
-  return false;
 }
 
 function updateBall() {
@@ -122,7 +118,7 @@ function endGame() {
     String(pad1P) + '-' + String(pad2P) + '\n' + ((pad2P == pad1P) ?
       "Empate" : ("Felicitaciones jugador " + ((pad1P < pad2P) ? "2" : "1")) + "!!!"));
   clear();
-  exit();
+  end=true;
 }
 
 function updateTime() {
@@ -139,11 +135,15 @@ function scored() {
   ballGoingUp = !ballGoingUp;
 }
 
+function kick() {
+  if (((ballX <= pad1X + 2 * padH - 2) && ((ballY >= left1) && (ballY <= right1))))
+    ballGoingLeft = false;
+  if ((ballX >= pad2X - padH) && ((ballY >= left2) && (ballY <= right2)))
+    ballGoingLeft = true;
+}
+
 function updateScore() {
-  if ((ballX == pad1X + 2 * padW - 2 && (ballY >= left1) && (ballY <= right1))
-    || (ballX == pad2X - padW && (ballY >= left2) && (ballY <= right2)))
-    ballGoingLeft = !ballGoingLeft;
-  else if (ballX < pad1X) {
+  if (ballX < pad1X) {
     pad2P += 1;
     scored();
   }
